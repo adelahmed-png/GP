@@ -1,7 +1,10 @@
+const PLACEHOLDER_IMAGE = 'https://placehold.co/100x100?text=No+Image';
+
 export default function ResultCard({ rank, image, score, onImageClick }) {
   const thumbSize = 'h-20 w-20 sm:h-24 sm:w-24';
   const isBestMatch = rank === 1;
   const percentage = typeof score === 'number' ? Math.round(score * 100) : 0;
+  const imageSrc = image || PLACEHOLDER_IMAGE;
 
   return (
     <article
@@ -29,20 +32,15 @@ export default function ResultCard({ rank, image, score, onImageClick }) {
         }
         aria-label={image && onImageClick ? `View suspect image rank ${rank}` : undefined}
       >
-        {image ? (
-          <img
-            src={image}
-            alt={`Suspect match ${rank}`}
-            className="h-full w-full rounded-lg object-cover transition-transform duration-200 ease-out hover:scale-105 hover:shadow-lg"
-          />
-        ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-1 rounded-lg bg-slate-700/50 p-2 text-center">
-            <svg className="h-8 w-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span className="text-xs text-slate-500">No image</span>
-          </div>
-        )}
+        <img
+          src={imageSrc}
+          alt={`Suspect match ${rank}`}
+          className="h-full w-full rounded-lg object-cover shadow-sm transition-transform duration-200 ease-out hover:scale-105 hover:shadow-lg"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = PLACEHOLDER_IMAGE;
+          }}
+        />
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex items-center gap-2">
