@@ -38,10 +38,14 @@ export async function searchByDescription(investigationId, description, options 
     const data = await response.json();
     return Array.isArray(data) ? data : data.results || [];
   } catch (e) {
-    const images = Array.isArray(fallbackImages)
-      ? fallbackImages.map((img) => (typeof img === 'string' ? img : img?.url ?? ''))
-      : [];
-    const urls = images.filter(Boolean);
+    const urls = (fallbackImages || [])
+      .map((img) => {
+        if (!img) return null;
+        if (typeof img === 'string') return img;
+        if (typeof img === 'object' && img.url) return img.url;
+        return null;
+      })
+      .filter(Boolean);
 
     if (urls.length === 0) {
       return [];

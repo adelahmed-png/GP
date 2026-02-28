@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useInvestigations } from '../../hooks/useInvestigations';
 import { searchByDescription } from '../../services/api';
@@ -16,6 +16,12 @@ export default function InvestigationPage() {
   const [similarityMetric, setSimilarityMetric] = useState('Cosine');
 
   const investigation = id ? getInvestigation(id) : null;
+
+  useEffect(() => {
+    setResults([]);
+    setError(null);
+    setIsLoading(false);
+  }, [id]);
 
   const handleSearch = async (description) => {
     if (!id) return;
