@@ -1,35 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { InvestigationsProvider } from './hooks/useInvestigations';
+import Sidebar from './components/Sidebar/Sidebar';
+import InvestigationModal from './components/InvestigationModal/InvestigationModal';
+import Home from './pages/Home/Home';
+import InvestigationPage from './pages/InvestigationPage/InvestigationPage';
 
-function App() {
-  const [count, setCount] = useState(0)
+function AppLayout() {
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen bg-slate-950">
+      <Sidebar onNewInvestigation={() => setModalOpen(true)} />
+      <main className="ml-[260px] flex min-h-screen min-w-0 flex-col">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/investigation/:id" element={<InvestigationPage />} />
+        </Routes>
+      </main>
+      <InvestigationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <InvestigationsProvider>
+        <AppLayout />
+      </InvestigationsProvider>
+    </BrowserRouter>
+  );
+}
