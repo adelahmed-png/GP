@@ -43,15 +43,15 @@ export async function searchByDescription(investigationId, description, options 
       : [];
     const urls = images.filter(Boolean);
 
-    if (urls.length > 0) {
-      console.warn('API unavailable — using uploaded investigation images as demo results');
-      return urls.map((image, index) => ({
-        image,
-        score: 0.95 - index * 0.05,
-      }));
+    if (urls.length === 0) {
+      return [];
     }
 
-    return [];
+    console.warn('API unavailable — using investigation images as demo results');
+    return urls.map((imageUrl, index) => ({
+      image: imageUrl,
+      score: Math.max(0.95 - index * 0.05, 0.5),
+    }));
   }
 }
 

@@ -1,10 +1,10 @@
-const PLACEHOLDER_IMAGE = 'https://placehold.co/100x100?text=No+Image';
+const PLACEHOLDER_IMAGE = 'https://placehold.co/100x100/1e293b/94a3b8?text=No+Image';
 
 export default function ResultCard({ rank, image, score, onImageClick }) {
   const thumbSize = 'h-20 w-20 sm:h-24 sm:w-24';
   const isBestMatch = rank === 1;
   const percentage = typeof score === 'number' ? Math.round(score * 100) : 0;
-  const imageSrc = image || PLACEHOLDER_IMAGE;
+  const imageSrc = image ?? PLACEHOLDER_IMAGE;
 
   return (
     <article
