@@ -5,24 +5,19 @@
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
-/** Demo placeholder images when backend is unavailable */
-const DEMO_IMAGES = [
-  'https://placehold.co/128x128/1e3a5f/fff?text=1',
-  'https://placehold.co/128x128/1e3a5f/fff?text=2',
-  'https://placehold.co/128x128/1e3a5f/fff?text=3',
-];
-
 /**
  * Search for suspects by text description.
+ * When the API is unavailable, returns demo results using fallbackImages (e.g. investigation uploads).
  * @param {string} investigationId - Current investigation ID
  * @param {string} description - Culprit text description
  * @param {Object} options - Optional settings
  * @param {string} options.modelVersion - CLIP | OpenCLIP | Custom Model
  * @param {string} options.similarityMetric - Cosine | Dot Product | Euclidean
+ * @param {string[]} options.fallbackImages - Image URLs to use as demo results when API fails (e.g. investigation.imageUrls)
  * @returns {Promise<Array<{image: string, score: number}>>} Ranked matches
  */
 export async function searchByDescription(investigationId, description, options = {}) {
-  const { modelVersion = 'CLIP', similarityMetric = 'Cosine' } = options;
+  const { modelVersion = 'CLIP', similarityMetric = 'Cosine', fallbackImages = [] } = options;
 
   try {
     const response = await fetch(`${API_BASE}/search`, {
@@ -37,20 +32,26 @@ export async function searchByDescription(investigationId, description, options 
     });
 
     if (!response.ok) {
-      const err = await response.json().catch(() => ({ message: response.statusText }));
-      throw new Error(err.message || 'Search failed');
+      throw new Error('Search failed');
     }
 
     const data = await response.json();
     return Array.isArray(data) ? data : data.results || [];
   } catch (e) {
-    if (import.meta.env.DEV) {
-      return DEMO_IMAGES.map((image, i) => ({
+    const images = Array.isArray(fallbackImages)
+      ? fallbackImages.map((img) => (typeof img === 'string' ? img : img?.url ?? ''))
+      : [];
+    const urls = images.filter(Boolean);
+
+    if (urls.length > 0) {
+      console.warn('API unavailable — using uploaded investigation images as demo results');
+      return urls.map((image, index) => ({
         image,
-        score: 0.95 - i * 0.04 - Math.random() * 0.02,
-      })).sort((a, b) => b.score - a.score);
+        score: 0.95 - index * 0.05,
+      }));
     }
-    throw e;
+
+    return [];
   }
 }
 

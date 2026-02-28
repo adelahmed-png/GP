@@ -25,6 +25,7 @@ export default function InvestigationPage() {
       const data = await searchByDescription(id, description, {
         modelVersion,
         similarityMetric,
+        fallbackImages: investigation?.imageUrls ?? [],
       });
       setResults(Array.isArray(data) ? data : []);
     } catch (e) {
